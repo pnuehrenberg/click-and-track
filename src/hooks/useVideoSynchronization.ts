@@ -59,11 +59,19 @@ export function useVideoSynchronization({
 
     const handleEnded = () => {
       setIsPlaying(false);
+      // When the video finishes, reset the time to 0 for a clean restart.
+      // This ensures that the next play action correctly starts from the first tracking frame.
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+      }
+      setCurrentTime(0);
+      onTimeUpdate(0);
+      nextPauseTimeRef.current = null;
     };
 
     vid.addEventListener("ended", handleEnded);
     return () => vid.removeEventListener("ended", handleEnded);
-  }, [setIsPlaying]);
+  }, [setIsPlaying, onTimeUpdate]);
 
   // Handle Play/Pause State
   useEffect(() => {
