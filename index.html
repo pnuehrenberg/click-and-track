@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>click&track</title>
+    <!-- Tailwind CDN: Only used in preview/dev without build step. 
+         Locally, you can remove this line if you use the build step. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Safety check: Only configure runtime tailwind if the CDN script loaded.
+      // Locally (npm run dev), this is skipped, and tailwind.config.js is used instead.
+      if (typeof tailwind !== 'undefined') {
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                gray: {
+                  750: '#3f3f46',
+                  800: '#27272a',
+                  850: '#27272a',
+                  900: '#18181b',
+                  950: '#121215',
+                },
+                active: '#EF8A62',
+                inactive: '#67A9CF'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script type="importmap">
+    {
+      "imports": {
+        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+        "mediainfo.js": "https://esm.sh/mediainfo.js@0.3.4",
+        "react-icons/pi": "https://esm.sh/react-icons@5.4.0/pi?external=react",
+        "react-icons/": "https://aistudiocdn.com/react-icons@^5.5.0/",
+        "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+        "vite": "https://aistudiocdn.com/vite@^7.2.4"
+      }
+    }
+    </script>
+  <link rel="stylesheet" href="/src/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <!-- Vite Entry Point -->
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
