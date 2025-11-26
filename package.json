@@ -5,7 +5,7 @@
   "homepage": "https://pnuehrenberg.github.io/click-and-track",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "mkdir -p public && cp node_modules/mediainfo.js/dist/MediaInfoModule.wasm public/ && vite",
     "build": "mkdir -p public && cp node_modules/mediainfo.js/dist/MediaInfoModule.wasm public/ && tsc && vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",

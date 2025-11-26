@@ -128,6 +128,7 @@ const App: React.FC = () => {
       currentTime,
       isPlaying,
       settings,
+      fps: videoFps,
     });
 
   const currentFrame = useMemo(
