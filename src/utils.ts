@@ -1,13 +1,15 @@
-import { TrackPoint } from '@/types';
+import { TrackPoint } from "@/types";
 
-export const formatTime = (ms: number): string => {
+export const formatTime = (ms: number, fps: number): string => {
+  ms = getFrameTime(getFrameIndex(ms, fps), fps);
+
   const totalSeconds = Math.floor(ms / 1000);
   const milliseconds = Math.floor(ms % 1000);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
 
-  const pad = (n: number, width = 2) => n.toString().padStart(width, '0');
+  const pad = (n: number, width = 2) => n.toString().padStart(width, "0");
 
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(milliseconds, 3)}`;
 };
@@ -34,19 +36,19 @@ export const getFrameTime = (frameIndex: number, fps: number): number => {
  * Uses frame indices to ensure robustness against floating point time drift.
  */
 export const isTrackingFrame = (
-  timestampMs: number, 
+  timestampMs: number,
   fps: number,
   rateNum: number, // Sampling Rate Numerator (samples)
-  rateDen: number  // Sampling Rate Denominator (seconds)
+  rateDen: number, // Sampling Rate Denominator (seconds)
 ): boolean => {
   if (fps <= 0) return false;
-  
-  // Calculate the interval in frames. 
-  // Interval (sec) = Den / Num. 
+
+  // Calculate the interval in frames.
+  // Interval (sec) = Den / Num.
   // Interval (frames) = (Den / Num) * FPS.
   const intervalSec = rateDen / rateNum;
   const intervalFrames = Math.round(intervalSec * fps);
-  
+
   if (intervalFrames <= 0) return true; // Every frame
 
   const currentFrame = getFrameIndex(timestampMs, fps);
@@ -55,22 +57,22 @@ export const isTrackingFrame = (
 
 // Parse CSV to Points
 export const parseCSV = (csvText: string): TrackPoint[] => {
-  const lines = csvText.split('\n');
+  const lines = csvText.split("\n");
   const points: TrackPoint[] = [];
   // Skip header if present
-  const startIndex = lines[0].includes('timestamp_ms') ? 1 : 0;
+  const startIndex = lines[0].includes("timestamp_ms") ? 1 : 0;
 
   for (let i = startIndex; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
-    const [ts, objId, x, y] = line.split(',').map(Number);
+    const [ts, objId, x, y] = line.split(",").map(Number);
     if (!isNaN(ts) && !isNaN(objId) && !isNaN(x) && !isNaN(y)) {
       points.push({
         id: `${ts}-${objId}`,
         timestamp: ts,
         objectId: objId,
         x,
-        y
+        y,
       });
     }
   }
@@ -86,7 +88,7 @@ export const pointsToCSV = (points: TrackPoint[]): string => {
   });
 
   let csv = "timestamp_ms,object_id,x,y\n";
-  sorted.forEach(p => {
+  sorted.forEach((p) => {
     csv += `${p.timestamp},${p.objectId},${p.x},${p.y}\n`;
   });
   return csv;
@@ -94,5 +96,5 @@ export const pointsToCSV = (points: TrackPoint[]): string => {
 
 export const generateColor = (isActive: boolean) => {
   // Hex colors matching the Python spec
-  return isActive ? '#EF8A62' : '#67A9CF';
+  return isActive ? "#EF8A62" : "#67A9CF";
 };

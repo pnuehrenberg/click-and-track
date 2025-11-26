@@ -305,7 +305,7 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
             <span
               className={`font-mono text-xl tracking-tight leading-none ${isFrameAligned ? "text-active" : "text-gray-200"}`}
             >
-              {formatTime(currentTime)}
+              {formatTime(currentTime, videoFps)}
             </span>
           </div>
 
