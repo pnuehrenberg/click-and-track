@@ -5,7 +5,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Use relative paths for assets to support Github Pages subdirectories
+  base: '/<your-repo-name>/', // Use repo name for Github Pages
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

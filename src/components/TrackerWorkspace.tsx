@@ -23,7 +23,6 @@ interface Props {
   activeObjectId: number;
   settings: AppSettings;
   onAddPoint: (p: TrackPoint) => void;
-  onDeletePoint: (timestamp: number, objectId: number) => void;
   onSelectObject: (id: number) => void;
   onTimeUpdate: (time: number) => void;
   isPlaying: boolean;
@@ -32,7 +31,6 @@ interface Props {
   seekRequest: { time: number; ts: number } | null;
   videoFps: number;
   isSpaceHeld: boolean;
-  widgetPosition: { x: number; y: number } | null;
   onToggleHelp: () => void;
   isObstructed: boolean;
   onStatusDimensionsChange: (dims: { width: number; height: number }) => void;
@@ -44,7 +42,6 @@ export const TrackerWorkspace: React.FC<Props> = ({
   activeObjectId,
   settings,
   onAddPoint,
-  onDeletePoint,
   onSelectObject,
   onTimeUpdate,
   isPlaying,
@@ -52,7 +49,6 @@ export const TrackerWorkspace: React.FC<Props> = ({
   seekRequest,
   videoFps,
   isSpaceHeld,
-  widgetPosition,
   onToggleHelp,
   isObstructed,
   onStatusDimensionsChange,

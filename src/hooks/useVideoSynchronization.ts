@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, MutableRefObject } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { AppSettings } from '@/types';
 import { getFrameIndex, getFrameTime } from '@/utils';
 

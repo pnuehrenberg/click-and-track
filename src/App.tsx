@@ -589,7 +589,6 @@ const App: React.FC = () => {
           activeObjectId={activeObjectId}
           settings={settings}
           onAddPoint={addPoint}
-          onDeletePoint={deletePoint}
           onSelectObject={setActiveObjectId}
           onTimeUpdate={setCurrentTime}
           isPlaying={isPlaying}
@@ -598,7 +597,6 @@ const App: React.FC = () => {
           seekRequest={seekRequest}
           videoFps={videoFps}
           isSpaceHeld={isSpaceHeld}
-          widgetPosition={widgetPosition}
           onToggleHelp={() => setIsHelpOpen(true)}
           isObstructed={isObstructed}
           onStatusDimensionsChange={handleStatusDimensionsChange}
