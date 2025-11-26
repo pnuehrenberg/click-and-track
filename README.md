@@ -1,6 +1,8 @@
 # click&track
 
-A web application for manual object tracking in videos. It allows you to load a video, mark the locations of multiple objects at specific frames, and export the tracking data to a CSV file.
+A simple web application for manual object tracking in videos. It allows you to load a video, mark the locations of multiple objects at specific frames, and export the tracking data to a CSV file.
+
+> **Note:** This is a learning project focused on web development with TypeScript, React, modern UI/CSS, and deployment practices, but nevertheless, it should be fully functional.
 
 ## Features
 

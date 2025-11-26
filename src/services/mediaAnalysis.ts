@@ -10,10 +10,14 @@ export async function getExactFrameRate(file: File): Promise<string> {
 
   try {
     // 1. Initialize WASM module
-    // Explicitly point to the WASM file on a reliable CDN to avoid relative path resolution issues
+    // Use local WASM for production builds, and a CDN for development
+    const wasmUrl = import.meta.env.PROD 
+      ? './MediaInfoModule.wasm' 
+      : 'https://cdn.jsdelivr.net/npm/mediainfo.js@0.3.4/dist/MediaInfoModule.wasm';
+
     mediaInfoHandle = await MediaInfoFactory({ 
         format: 'object',
-        locateFile: () => 'https://cdn.jsdelivr.net/npm/mediainfo.js@0.3.4/dist/MediaInfoModule.wasm'
+        locateFile: () => wasmUrl
     });
 
     // 2. Define Chunked Reader

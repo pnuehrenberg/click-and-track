@@ -13,6 +13,7 @@ node_modules/
 # Build artifacts
 dist/
 dist-ssr/
+public/
 
 # Editor directories and files
 .vscode/

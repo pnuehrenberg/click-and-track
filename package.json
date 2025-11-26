@@ -2,11 +2,11 @@
   "name": "click-and-track",
   "private": true,
   "version": "1.0.0",
-  "homepage": "https://<your-github-username>.github.io/<your-repo-name>",
+  "homepage": "https://pnuehrenberg.github.io/click-and-track",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "mkdir -p public && cp node_modules/mediainfo.js/dist/MediaInfoModule.wasm public/ && tsc && vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -19,6 +19,7 @@
     "react-icons": "^5.4.0"
   },
   "devDependencies": {
+    "@types/node": "^24.10.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.2.1",
