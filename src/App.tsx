@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { Upload, Monitor } from "lucide-react";
 import { PiMouseLeftClickFill } from "react-icons/pi";
+import { FaGithub } from "react-icons/fa";
 
 import { AppSettings } from "@/types";
 import { TrackerWorkspace } from "@/components/TrackerWorkspace";
@@ -439,7 +440,16 @@ const App: React.FC = () => {
 
   if (!videoUrl) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950 text-white p-6">
+      <div className="flex items-center justify-center min-h-screen bg-gray-950 text-white p-6 relative">
+        <a
+          href="https://github.com/pnuehrenberg/click-and-track"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-8 right-8 text-gray-400 hover:text-white transition-colors"
+          aria-label="View on GitHub"
+        >
+          <FaGithub size={28} />
+        </a>
         <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
           {/* Left Column: Hero & Upload */}
           <div className="flex flex-col space-y-8">
@@ -473,31 +483,37 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <label className="block w-full max-w-sm ml-2">
-              <div
-                className="flex items-center justify-center w-full h-14 bg-gray-800 hover:bg-gray-750 border border-gray-750 text-gray-200 hover:text-white transition-all cursor-pointer rounded-xl font-medium shadow-lg hover:shadow-active/10 group outline-none focus-visible:border-active"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    videoInputRef.current?.click();
-                  }
-                }}
-              >
-                <Upload
-                  className="mr-3 text-gray-400 group-hover:text-active group-hover:scale-110 transition-all"
-                  size={22}
+            <div className="w-full max-w-sm ml-2 space-y-3">
+              <label className="block w-full">
+                <div
+                  className="flex items-center justify-center w-full h-14 bg-gray-800 hover:bg-gray-750 border border-gray-750 text-gray-200 hover:text-white transition-all cursor-pointer rounded-xl font-medium shadow-lg hover:shadow-active/10 group outline-none focus-visible:border-active"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      videoInputRef.current?.click();
+                    }
+                  }}
+                >
+                  <Upload
+                    className="mr-3 text-gray-400 group-hover:text-active group-hover:scale-110 transition-all"
+                    size={22}
+                  />
+                  <span className="text-lg">Open Video File</span>
+                </div>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoUpload}
+                  className="hidden"
+                  ref={videoInputRef}
                 />
-                <span className="text-lg">Open Video File</span>
-              </div>
-              <input
-                type="file"
-                accept="video/*"
-                onChange={handleVideoUpload}
-                className="hidden"
-                ref={videoInputRef}
-              />
-            </label>
+              </label>
+              <p className="text-m text-gray-500 text-center px-2">
+                Your video and tracking data are processed locally in your
+                browser and are never uploaded.
+              </p>
+            </div>
           </div>
 
           {/* Right Column: Visual Guide (Bg 900) */}
