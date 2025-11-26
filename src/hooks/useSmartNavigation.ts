@@ -28,14 +28,18 @@ export function useSmartNavigation({
     setSeekRequest({ time, ts: Date.now() });
   }, []);
 
-  const samplingInterval = settings.samplingRateDen / settings.samplingRateNum;
-  const intervalFrames = Math.round(samplingInterval * fps);
+  // Frame-perfect interval calculation
+  const samplingIntervalSec =
+    settings.samplingRateDen / settings.samplingRateNum;
+  const intervalFrames = Math.round(samplingIntervalSec * fps);
 
   const jumpToPrevious = useCallback(() => {
     if (isPlaying) return;
-    // Navigate only through visible points
+    // Navigate only through visible points of the active object that are truly before the current time
     const relevant = visiblePoints.filter(
-      (p) => p.objectId === activeObjectId && p.timestamp < currentTime - 20,
+      (p) =>
+        p.objectId === activeObjectId &&
+        getFrameIndex(p.timestamp, fps) < getFrameIndex(currentTime, fps),
     );
     if (relevant.length > 0) {
       // Go to nearest previous POINT
@@ -57,14 +61,17 @@ export function useSmartNavigation({
     currentTime,
     isPlaying,
     intervalFrames,
+    fps,
     triggerSeek,
   ]);
 
   const jumpToNext = useCallback(() => {
     if (isPlaying) return;
-    // Navigate only through visible points
+    // Navigate only through visible points of the active object that are truly after the current time
     const relevant = visiblePoints.filter(
-      (p) => p.objectId === activeObjectId && p.timestamp > currentTime + 20,
+      (p) =>
+        p.objectId === activeObjectId &&
+        getFrameIndex(p.timestamp, fps) > getFrameIndex(currentTime, fps),
     );
     if (relevant.length > 0) {
       // Go to nearest future POINT
@@ -73,8 +80,7 @@ export function useSmartNavigation({
       );
       triggerSeek(next.timestamp);
     } else {
-      // Step forward one INTERVAL
-      // Step back one INTERVAL (precisely)
+      // Step forward one INTERVAL (precisely)
       const target = getFrameTime(
         getFrameIndex(currentTime, fps) + intervalFrames,
         fps,
@@ -87,6 +93,7 @@ export function useSmartNavigation({
     currentTime,
     isPlaying,
     intervalFrames,
+    fps,
     triggerSeek,
   ]);
 
@@ -101,7 +108,9 @@ export function useSmartNavigation({
 
       // If we are currently after the first record, jump to it.
       // If we are already at (or before) the first record, rewind to the beginning of the video (0).
-      if (currentTime > first.timestamp + 20) {
+      if (
+        getFrameIndex(currentTime, fps) > getFrameIndex(first.timestamp, fps)
+      ) {
         triggerSeek(first.timestamp);
       } else {
         triggerSeek(0);

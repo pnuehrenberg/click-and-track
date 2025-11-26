@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
-import { AppSettings } from '@/types';
-import { getFrameIndex, getFrameTime } from '@/utils';
+import { useRef, useState, useEffect } from "react";
+import { AppSettings } from "@/types";
+import { getFrameIndex, getFrameTime } from "@/utils";
 
 interface UseVideoSyncProps {
   videoSrc: string;
@@ -21,10 +21,10 @@ export function useVideoSynchronization({
   seekRequest,
   settings,
   onTimeUpdate,
-  isSpaceHeld
+  isSpaceHeld,
 }: UseVideoSyncProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDimensions, setVideoDimensions] = useState({ w: 0, h: 0 });
 
@@ -40,11 +40,17 @@ export function useVideoSynchronization({
   // Handle Seek
   useEffect(() => {
     if (seekRequest && videoRef.current) {
-      videoRef.current.currentTime = seekRequest.time / 1000;
-      setCurrentTime(seekRequest.time);
+      // Snap the requested time to the nearest frame boundary for precision.
+      const frameAlignedTime = getFrameTime(
+        getFrameIndex(seekRequest.time, videoFps),
+        videoFps,
+      );
+
+      videoRef.current.currentTime = frameAlignedTime / 1000;
+      setCurrentTime(frameAlignedTime);
       nextPauseTimeRef.current = null;
     }
-  }, [seekRequest]);
+  }, [seekRequest, videoFps]);
 
   // Sync Video Events to State (Handle End of Video)
   useEffect(() => {
@@ -55,8 +61,8 @@ export function useVideoSynchronization({
       setIsPlaying(false);
     };
 
-    vid.addEventListener('ended', handleEnded);
-    return () => vid.removeEventListener('ended', handleEnded);
+    vid.addEventListener("ended", handleEnded);
+    return () => vid.removeEventListener("ended", handleEnded);
   }, [setIsPlaying]);
 
   // Handle Play/Pause State
@@ -67,8 +73,12 @@ export function useVideoSynchronization({
     if (isPlaying) {
       const playPromise = vid.play();
       if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          if (error.name === 'AbortError' || error.message.includes('interrupted')) return;
+        playPromise.catch((error) => {
+          if (
+            error.name === "AbortError" ||
+            error.message.includes("interrupted")
+          )
+            return;
           console.error("Play failed", error);
         });
       }
@@ -80,16 +90,16 @@ export function useVideoSynchronization({
 
   // Reset on src change
   useEffect(() => {
-      setVideoDimensions({ w: 0, h: 0 });
+    setVideoDimensions({ w: 0, h: 0 });
   }, [videoSrc]);
 
   // Metadata handler
   const onLoadedMetadata = () => {
     if (videoRef.current) {
-        setVideoDimensions({
-            w: videoRef.current.videoWidth,
-            h: videoRef.current.videoHeight
-        });
+      setVideoDimensions({
+        w: videoRef.current.videoWidth,
+        h: videoRef.current.videoHeight,
+      });
     }
   };
 
@@ -99,79 +109,87 @@ export function useVideoSynchronization({
     if (!vid) return;
 
     type VideoFrameCallback = (now: number, metadata: any) => void;
-    
+
     const requestVideoFrame = (cb: VideoFrameCallback) => {
-        if ('requestVideoFrameCallback' in vid) {
-            isRvfcRef.current = true;
-            // @ts-ignore
-            return vid.requestVideoFrameCallback(cb);
-        } else {
-            isRvfcRef.current = false;
-            return requestAnimationFrame((now) => cb(now, null));
-        }
+      if ("requestVideoFrameCallback" in vid) {
+        isRvfcRef.current = true;
+        // @ts-ignore
+        return vid.requestVideoFrameCallback(cb);
+      } else {
+        isRvfcRef.current = false;
+        return requestAnimationFrame((now) => cb(now, null));
+      }
     };
 
     const cancelVideoFrame = (id: number) => {
-        if (isRvfcRef.current && 'cancelVideoFrameCallback' in vid) {
-            // @ts-ignore
-            vid.cancelVideoFrameCallback(id);
-        } else {
-            cancelAnimationFrame(id);
-        }
+      if (isRvfcRef.current && "cancelVideoFrameCallback" in vid) {
+        // @ts-ignore
+        vid.cancelVideoFrameCallback(id);
+      } else {
+        cancelAnimationFrame(id);
+      }
     };
 
     const loop = (_now: number, metadata: any) => {
-        if (!vid) return;
-        
-        const nowMs = metadata ? metadata.mediaTime * 1000 : vid.currentTime * 1000;
-        setCurrentTime(nowMs);
-        onTimeUpdate(nowMs);
+      if (!vid) return;
 
-        // Frame-Based Auto-Pause Logic
-        if (isPlaying && settings.samplingRateNum > 0 && !isSpaceHeldRef.current) {
-            
-            const intervalSec = settings.samplingRateDen / settings.samplingRateNum;
-            const intervalFrames = Math.max(1, Math.round(intervalSec * videoFps));
-            const currentFrame = getFrameIndex(nowMs, videoFps);
+      const nowMs = metadata
+        ? metadata.mediaTime * 1000
+        : vid.currentTime * 1000;
+      setCurrentTime(nowMs);
+      onTimeUpdate(nowMs);
 
-            if (nextPauseTimeRef.current === null) {
-                let nextTargetFrame = Math.ceil((currentFrame + 0.1) / intervalFrames) * intervalFrames;
-                if (nextTargetFrame <= currentFrame) {
-                    nextTargetFrame += intervalFrames;
-                }
-                nextPauseTimeRef.current = getFrameTime(nextTargetFrame, videoFps);
-            }
+      // Frame-Based Auto-Pause Logic
+      if (
+        isPlaying &&
+        settings.samplingRateNum > 0 &&
+        !isSpaceHeldRef.current
+      ) {
+        const intervalSec = settings.samplingRateDen / settings.samplingRateNum;
+        const intervalFrames = Math.max(1, Math.round(intervalSec * videoFps));
+        const currentFrame = getFrameIndex(nowMs, videoFps);
 
-            const targetTime = nextPauseTimeRef.current;
-            const remaining = targetTime - nowMs;
-            const frameDurationMs = 1000 / videoFps;
-            const threshold = frameDurationMs * 0.85;
-
-            if (remaining <= threshold) {
-                setIsPlaying(false);
-                vid.currentTime = targetTime / 1000;
-                setCurrentTime(targetTime);
-                nextPauseTimeRef.current = null;
-                return; 
-            }
-        } 
-        
-        if (isPlaying && 'requestVideoFrameCallback' in vid) {
-            // @ts-ignore
-            loopHandleRef.current = vid.requestVideoFrameCallback(loop);
-            isRvfcRef.current = true;
-        } else {
-            loopHandleRef.current = requestAnimationFrame(() => loop(performance.now(), null));
-            isRvfcRef.current = false;
+        if (nextPauseTimeRef.current === null) {
+          let nextTargetFrame =
+            Math.ceil((currentFrame + 0.1) / intervalFrames) * intervalFrames;
+          if (nextTargetFrame <= currentFrame) {
+            nextTargetFrame += intervalFrames;
+          }
+          nextPauseTimeRef.current = getFrameTime(nextTargetFrame, videoFps);
         }
+
+        const targetTime = nextPauseTimeRef.current;
+        const remaining = targetTime - nowMs;
+        const frameDurationMs = 1000 / videoFps;
+        const threshold = frameDurationMs * 0.85;
+
+        if (remaining <= threshold) {
+          setIsPlaying(false);
+          vid.currentTime = targetTime / 1000;
+          setCurrentTime(targetTime);
+          nextPauseTimeRef.current = null;
+          return;
+        }
+      }
+
+      if (isPlaying && "requestVideoFrameCallback" in vid) {
+        // @ts-ignore
+        loopHandleRef.current = vid.requestVideoFrameCallback(loop);
+        isRvfcRef.current = true;
+      } else {
+        loopHandleRef.current = requestAnimationFrame(() =>
+          loop(performance.now(), null),
+        );
+        isRvfcRef.current = false;
+      }
     };
 
     loopHandleRef.current = requestVideoFrame(loop);
 
     return () => {
-        if (loopHandleRef.current !== null) {
-            cancelVideoFrame(loopHandleRef.current);
-        }
+      if (loopHandleRef.current !== null) {
+        cancelVideoFrame(loopHandleRef.current);
+      }
     };
   }, [isPlaying, settings, onTimeUpdate, setIsPlaying, videoFps]);
 
@@ -179,6 +197,6 @@ export function useVideoSynchronization({
     videoRef,
     currentTime,
     videoDimensions,
-    onLoadedMetadata
+    onLoadedMetadata,
   };
 }
