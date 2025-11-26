@@ -42,6 +42,11 @@ export function useLongPress(callback: () => void, ms = 400, interval = 50) {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (intervalRef.current) clearInterval(intervalRef.current);
     isPressingRef.current = false; // Reset press state
+
+    // Safely blur the current target if an event object is provided and it's a DOM element
+    if (event && event.currentTarget instanceof HTMLElement) {
+      event.currentTarget.blur();
+    }
   }, []);
 
   return {

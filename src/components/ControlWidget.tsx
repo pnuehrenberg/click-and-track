@@ -249,7 +249,6 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
       onPointerCancel={handlePointerUp}
       onClick={(e) => {
         handleWidgetClick(e);
-        e.currentTarget.blur();
       }}
       tabIndex={0}
       className={`fixed ${positioningClasses} flex flex-col w-[26rem] p-2 gap-2 font-sans outline-none touch-none select-none z-30 ${transitionClass} ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
