@@ -247,7 +247,10 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      onClick={handleWidgetClick}
+      onClick={(e) => {
+        handleWidgetClick(e);
+        e.currentTarget.blur();
+      }}
       tabIndex={0}
       className={`fixed ${positioningClasses} flex flex-col w-[26rem] p-2 gap-2 font-sans outline-none touch-none select-none z-30 ${transitionClass} ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
     >
@@ -255,8 +258,11 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
       <div className="flex items-center justify-between bg-gray-900/95 backdrop-blur border border-gray-750/50 rounded-xl shadow-xl px-2 py-2 w-full transition-colors">
         <Tooltip content="Rewind to first record" shortcut={["Shift", "R"]}>
           <button
-            onClick={onJumpToFirst}
-            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              onJumpToFirst();
+              e.currentTarget.blur();
+            }}
+            /* onPointerDown={(e) => e.stopPropagation()} */
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition outline-none border border-transparent focus-visible:border-active cursor-pointer"
           >
             <ArrowLeftToLine size={20} />
@@ -266,7 +272,7 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
         <Tooltip content="Rewind to previous record" shortcut={["R"]}>
           <button
             {...prevFrameProps}
-            onPointerDown={(e) => e.stopPropagation()}
+            /* onPointerDown={(e) => e.stopPropagation()} */
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition outline-none border border-transparent focus-visible:border-active cursor-pointer"
           >
             <ArrowLeft size={20} />
@@ -276,7 +282,7 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
         <Tooltip content="Forward to next record" shortcut={["F"]}>
           <button
             {...nextFrameProps}
-            onPointerDown={(e) => e.stopPropagation()}
+            /* onPointerDown={(e) => e.stopPropagation()} */
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition outline-none border border-transparent focus-visible:border-active cursor-pointer"
           >
             <ArrowRight size={20} />
@@ -285,8 +291,11 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
 
         <Tooltip content="Forward to final record" shortcut={["Shift", "F"]}>
           <button
-            onClick={onJumpToFinal}
-            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              onJumpToFinal();
+              e.currentTarget.blur();
+            }}
+            /* onPointerDown={(e) => e.stopPropagation()} */
             className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition outline-none border border-transparent focus-visible:border-active cursor-pointer"
           >
             <ArrowRightToLine size={20} />
@@ -404,8 +413,9 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
                   tabIndex={-1}
                   onClick={(e) => {
                     if (e.detail === 0) onPrevObject();
+                    e.currentTarget.blur();
                   }} // Keyboard access via parent group
-                  onPointerDown={(e) => e.stopPropagation()}
+                  /* onPointerDown={(e) => e.stopPropagation()} */
                   className="px-3 hover:bg-gray-700 border-r border-gray-700 text-gray-400 hover:text-white transition active:bg-gray-600 outline-none cursor-pointer"
                 >
                   <ChevronLeft size={20} />
@@ -424,8 +434,9 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
                   tabIndex={-1}
                   onClick={(e) => {
                     if (e.detail === 0) onNextObject();
+                    e.currentTarget.blur();
                   }} // Keyboard access via parent group
-                  onPointerDown={(e) => e.stopPropagation()}
+                  /* onPointerDown={(e) => e.stopPropagation()} */
                   className="px-3 hover:bg-gray-700 border-l border-gray-700 text-gray-400 hover:text-white transition active:bg-gray-600 outline-none cursor-pointer"
                 >
                   <ChevronRight size={20} />
@@ -435,13 +446,14 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
 
             <Tooltip content="Add new object track" shortcut={["N"]}>
               <button
-                onClick={() =>
+                onClick={(e) => {
+                  e.currentTarget.blur();
                   setNumObjects((n) => {
                     setActiveObjectId(n + 1);
                     return n + 1;
-                  })
-                }
-                onPointerDown={(e) => e.stopPropagation()}
+                  });
+                }}
+                /* onPointerDown={(e) => e.stopPropagation()} */
                 className="p-3 bg-gray-800 hover:bg-gray-700 border border-gray-750 rounded-lg text-gray-300 hover:text-white transition outline-none focus-visible:border-active group cursor-pointer"
               >
                 <Plus
@@ -455,11 +467,11 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
           {/* Row 4: I/O */}
           <div className="grid grid-cols-3 gap-3 pt-1">
             <button
-              onClick={() => {
+              onClick={(e) => {
                 onLoadVideo();
-                widgetRef.current?.focus({ preventScroll: true });
+                e.currentTarget.blur();
               }}
-              onPointerDown={(e) => e.stopPropagation()}
+              /* onPointerDown={(e) => e.stopPropagation()} */
               className="flex flex-col items-center justify-center space-y-1 bg-gray-800 hover:bg-gray-700 border border-gray-750 text-gray-300 hover:text-white text-xs font-medium py-2 rounded-lg cursor-pointer transition group outline-none focus-visible:border-active"
             >
               <FileVideo
@@ -470,11 +482,11 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
             </button>
 
             <button
-              onClick={() => {
+              onClick={(e) => {
                 onImportCSV();
-                widgetRef.current?.focus({ preventScroll: true });
+                e.currentTarget.blur();
               }}
-              onPointerDown={(e) => e.stopPropagation()}
+              /* onPointerDown={(e) => e.stopPropagation()} */
               className="flex flex-col items-center justify-center space-y-1 bg-gray-800 hover:bg-gray-700 border border-gray-750 text-gray-300 hover:text-white text-xs font-medium py-2 rounded-lg cursor-pointer transition group outline-none focus-visible:border-active"
             >
               <Upload
@@ -485,11 +497,11 @@ export const ControlWidget: React.FC<ControlWidgetProps> = ({
             </button>
 
             <button
-              onClick={() => {
+              onClick={(e) => {
                 onExportCSV();
-                widgetRef.current?.focus({ preventScroll: true });
+                e.currentTarget.blur();
               }}
-              onPointerDown={(e) => e.stopPropagation()}
+              /* onPointerDown={(e) => e.stopPropagation()} */
               className="flex flex-col items-center justify-center space-y-1 bg-gray-800 hover:bg-gray-700 border border-gray-750 text-gray-300 hover:text-white text-xs font-medium py-2 rounded-lg cursor-pointer transition group outline-none focus-visible:border-active"
             >
               <Download
