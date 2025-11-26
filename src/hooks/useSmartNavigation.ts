@@ -28,7 +28,7 @@ export function useSmartNavigation({
     setSeekRequest({ time, ts: Date.now() });
   }, []);
 
-  const samplingInterval = settings.samplingRateNum / settings.samplingRateDen;
+  const samplingInterval = settings.samplingRateDen / settings.samplingRateNum;
   const intervalFrames = Math.round(samplingInterval * fps);
 
   const jumpToPrevious = useCallback(() => {
